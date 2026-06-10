@@ -44,6 +44,8 @@ public class BookingService : IBookingService
 
         var totalPrice = passengerCount * flight.BasePrice;
 
+        var pnr = await GenerateUniquePnrAsync();
+
         var booking = new Booking
         {
             FlightId = dto.FlightId,
@@ -55,7 +57,8 @@ public class BookingService : IBookingService
 
             TotalPrice = totalPrice,
             BookingDate = DateTime.Now,
-            Status = "Confirmed"
+            Status = "Confirmed",
+            PnrNumber = pnr
         };
 
         await _bookingCollection.InsertOneAsync(booking);
@@ -67,5 +70,27 @@ public class BookingService : IBookingService
         //    x => x.FlightId == dto.FlightId,
         //    update
         //);
+    }
+
+    private async Task<string> GenerateUniquePnrAsync()
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var random = new Random();
+
+        string pnr;
+        bool exists;
+
+        do
+        {
+            pnr = new string(Enumerable.Repeat(chars, 6)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            exists = await _bookingCollection
+                .Find(x => x.PnrNumber == pnr)
+                .AnyAsync();
+
+        } while (exists);
+
+        return pnr;
     }
 }
