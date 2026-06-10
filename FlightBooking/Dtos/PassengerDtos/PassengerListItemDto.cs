@@ -11,24 +11,24 @@
         public string Email { get; set; }
 
         // Cinsiyet
-        public string Gender { get; set; }            // Erkek / Kadın
-        public string PnrNumber { get; set; }            // Erkek / Kadın
+        public string Gender { get; set; }            
+        public string PnrNumber { get; set; }            
 
         // Tip
-        public string PassengerType { get; set; }     // Yetişkin / Çocuk / Bebek
+        public string PassengerType { get; set; }     
 
         // PNR
         // Koltuk
-        public string SeatNumber { get; set; }        // 12A
+        public string SeatNumber { get; set; }        
 
         // Check-in
-        public string CheckInStatus { get; set; }     // Checked-In / Not Checked
+        public string CheckInStatus { get; set; }     
 
         // Ödeme
-        public string PaymentStatus { get; set; }     // Paid / Pending / Failed
+        public string PaymentStatus { get; set; }     
 
         // Bilet
-        public string TicketStatus { get; set; }      // Issued / Not Issued
+        public string TicketStatus { get; set; }      
 
         // İletişim
         public string Phone { get; set; }
