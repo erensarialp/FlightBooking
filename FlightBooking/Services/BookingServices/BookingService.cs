@@ -72,6 +72,52 @@ public class BookingService : IBookingService
         //);
     }
 
+    public async Task<string> GetGateByPassengerIdAsync(string passengerId)
+    {
+        var booking = await _bookingCollection.Find(x => x.Passengers.Any(p => p.PassengerId == passengerId)).FirstOrDefaultAsync();
+
+        if (booking == null)
+            return null;
+
+        var passenger = booking.Passengers.FirstOrDefault(p => p.PassengerId == passengerId);
+
+        if (passenger == null)
+            return null;
+
+        return passenger.Gate;
+    }
+
+    public async Task<(string Name, string Surname)> GetPassengerNameByIdAsync(string passengerId)
+    {
+        var booking = await _bookingCollection
+            .Find(x => x.Passengers.Any(p => p.PassengerId == passengerId))
+            .FirstOrDefaultAsync(); //icinde bu passenger olan bookingi bul
+
+        if (booking == null)
+            return (null, null);
+
+        var passenger = booking.Passengers //booking icinden passenger`i cek
+            .FirstOrDefault(p => p.PassengerId == passengerId);
+
+        if(passenger == null) 
+            return (null,null);
+
+        return (passenger.Name, passenger.Surname);
+
+    }
+
+    public async Task<string> GetPnrByPassengerIdAsync(string passengerId)
+    {
+        var booking = await _bookingCollection.Find(x => x.Passengers.Any(p => p.PassengerId == passengerId))
+            .FirstOrDefaultAsync();
+
+        if (booking == null)
+            return null;
+
+        return booking.PnrNumber;
+
+    }
+
     private async Task<string> GenerateUniquePnrAsync()
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
