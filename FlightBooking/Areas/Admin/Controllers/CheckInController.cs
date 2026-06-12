@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
+using FlightBooking.Dtos.CheckInDtos;
 using FlightBooking.Services.BookingServices;
+using FlightBooking.Services.CheckInServices;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -10,33 +12,67 @@ namespace FlightBooking.Areas.Admin.Controllers
     {
         
         private readonly IBookingService _bookingService;
+        private readonly ICheckInService _checkInService;
 
-        public CheckInController(IBookingService bookingService)
+        public CheckInController(IBookingService bookingService, ICheckInService checkInService)
         {
             _bookingService = bookingService;
+            _checkInService = checkInService;
         }
+
+        //public async Task<IActionResult> Index(string id)
+        //{
+        //    ViewBag.flightNumber = TempData["flightnumber"];
+        //    ViewBag.DepartureTime = TempData["DepartureTime"];
+        //    ViewBag.ArrivalTime = TempData["ArrivalTime"];
+
+        //    var passenger = await _bookingService.GetPassengerNameByIdAsync(id);
+        //    var pnrNumber = await _bookingService.GetPnrByPassengerIdAsync(id);
+        //    var gate = await _bookingService.GetGateByPassengerIdAsync(id);
+
+        //    ViewBag.Name = passenger.Name;
+        //    ViewBag.Surname = passenger.Surname;
+        //    ViewBag.PnrNumber = pnrNumber;
+        //    ViewBag.Gate = gate;    
+
+        //    return View();
+        //}
 
         public async Task<IActionResult> Index(string id)
         {
-            ViewBag.flightNumber = TempData["flightnumber"];
+            ViewBag.FlightNumber = TempData["FlightNumber"];
             ViewBag.DepartureTime = TempData["DepartureTime"];
             ViewBag.ArrivalTime = TempData["ArrivalTime"];
+            ViewBag.AirlineCode = TempData["AirlineCode"];          
+            ViewBag.DepartureAirportCode = TempData["DepartureAirportCode"];
+            ViewBag.DepartureAirportName = TempData["DepartureAirportName"];
+            ViewBag.ArrivalAirportCode = TempData["ArrivalAirportCode"];
+            ViewBag.ArrivalAirportName = TempData["ArrivalAirportName"];
+            ViewBag.BasePrice = TempData["BasePrice"];
+            ViewBag.Currency = TempData["Currency"];
 
             var passenger = await _bookingService.GetPassengerNameByIdAsync(id);
             var pnrNumber = await _bookingService.GetPnrByPassengerIdAsync(id);
             var gate = await _bookingService.GetGateByPassengerIdAsync(id);
+            //var flightId = await _bookingService.GetFlightIdByPassengerIdAsync(id); 
 
             ViewBag.Name = passenger.Name;
             ViewBag.Surname = passenger.Surname;
+            ViewBag.PassengerName = passenger.Name + " " + passenger.Surname;
             ViewBag.PnrNumber = pnrNumber;
-            ViewBag.Gate = gate;    
-            
+            ViewBag.Pnr = pnrNumber;   
+            ViewBag.Gate = gate;
+            ViewBag.PassengerId = id;
+            ViewBag.FlightId = "6a259dae00206e1600900cc4";
+
             return View();
         }
 
-        public async Task<IActionResult> Index()
+        [HttpPost]
+        public async Task<IActionResult> Index(CompleteCheckInDto completeCheckInDto)
         {
-            return RedirectToAction("Index");
+            await _checkInService.CompleteCheckInAsync(completeCheckInDto);
+            return RedirectToAction("Test");
         }
     }
 }
