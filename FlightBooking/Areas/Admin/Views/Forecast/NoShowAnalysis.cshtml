@@ -4,12 +4,10 @@
     ViewData["Title"] = "No-Show Analizi";
     Layout = "~/Areas/Admin/Views/Layout/AdminLayout.cshtml";
 
-    @* ── Razor tarafında KPI hesapları ── *@
     double avgNoShow = Model.Count > 0 ? Model.Values.Average() : 0;
     var riskiest = Model.Count > 0 ? Model.OrderByDescending(x => x.Value).First() : new KeyValuePair<string, double>("—", 0);
     var stablest = Model.Count > 0 ? Model.OrderBy(x => x.Value).First() : new KeyValuePair<string, double>("—", 0);
-    @* Overbooking önerisi: no-show oranının %60'ı kadar koltuk fazladan satılabilir *@
-    double avgOverbooking = avgNoShow * 0.6;
+    double avgOverbooking = Math.Round(avgNoShow * 0.6, 1);
 }
 
 @section Styles {
@@ -86,6 +84,284 @@
                 background: #f8fafc;
             }
 
+        /* ── Flight Operation Summary ── */
+        .fos-card {
+            background: #fff;
+            border: 1px solid #e8edf5;
+            border-radius: 14px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(15,23,42,.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .fos-card::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background: linear-gradient(180deg,#2563eb 0%,#7c3aed 100%);
+                border-radius: 14px 0 0 14px;
+            }
+
+        .fos-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .fos-route-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .fos-airport {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .fos-airport-right {
+            text-align: right;
+        }
+
+        .fos-iata {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -.5px;
+            line-height: 1;
+        }
+
+        .fos-airport-name {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .fos-country {
+            font-size: 10.5px;
+            color: #94a3b8;
+        }
+
+        .fos-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            min-width: 160px;
+        }
+
+        .fos-conn-line {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .fos-conn-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #2563eb;
+            flex-shrink: 0;
+        }
+
+        .fos-conn-dashes {
+            flex: 1;
+            height: 1.5px;
+            background: repeating-linear-gradient(90deg,#bfdbfe 0,#bfdbfe 5px,transparent 5px,transparent 9px);
+        }
+
+        .fos-plane-ico {
+            font-size: 16px;
+            color: #2563eb;
+            flex-shrink: 0;
+        }
+
+        .fos-conn-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 10.5px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .fos-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .fos-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 99px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border: 1.5px solid transparent;
+        }
+
+        .fos-badge-blue {
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #bfdbfe;
+        }
+
+        .fos-badge-green {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-color: #bbf7d0;
+        }
+
+        .fos-badge-purple {
+            background: #f5f3ff;
+            color: #7c3aed;
+            border-color: #ddd6fe;
+        }
+
+        .fos-divider {
+            border: none;
+            border-top: 1px dashed #e2e8f0;
+            margin: 16px 0;
+        }
+
+        .fos-meta-grid {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .fos-meta-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 0 20px;
+            flex: 1;
+            min-width: 160px;
+        }
+
+            .fos-meta-item:first-child {
+                padding-left: 0;
+            }
+
+        .fos-meta-item-wide {
+            flex: 1.4;
+        }
+
+        .fos-meta-sep {
+            width: 1px;
+            background: #f1f5f9;
+            align-self: stretch;
+            min-height: 48px;
+        }
+
+        .fos-meta-ico {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .fos-meta-body {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .fos-meta-lbl {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: #94a3b8;
+        }
+
+        .fos-meta-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .fos-meta-sub {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .fos-slots {
+            display: flex;
+            gap: 5px;
+            margin-top: 3px;
+        }
+
+        .fos-slot {
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+
+        .fos-slot-morning {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .fos-slot-evening {
+            background: #f5f3ff;
+            color: #7c3aed;
+        }
+
+        .fos-ai-chips {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 3px;
+        }
+
+        .fos-ai-chip {
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 10.5px;
+            font-weight: 600;
+            background: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #fed7aa;
+        }
+
+        .fos-fleet {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px 10px;
+            margin-top: 3px;
+        }
+
+        .fos-fleet-item {
+            font-size: 11.5px;
+            color: #475569;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+            .fos-fleet-item i {
+                color: #dc2626;
+                font-size: 16px;
+            }
+
         /* ── KPI Cards ── */
         .kpi-grid {
             display: grid;
@@ -102,7 +378,7 @@
             display: flex;
             flex-direction: column;
             gap: 14px;
-            transition: box-shadow .18s, transform .18s;
+            transition: box-shadow .18s,transform .18s;
             position: relative;
             overflow: hidden;
         }
@@ -371,7 +647,6 @@
                 color: #334155;
             }
 
-        /* Slot kolonu */
         .slot-cell {
             display: flex;
             align-items: center;
@@ -391,7 +666,6 @@
             font-size: 13.5px;
         }
 
-        /* No-show % göstergesi */
         .ns-pct-wrap {
             display: flex;
             align-items: center;
@@ -419,7 +693,6 @@
             text-align: right;
         }
 
-        /* Risk badge */
         .risk-badge {
             display: inline-flex;
             align-items: center;
@@ -448,7 +721,6 @@
             border: 1px solid #bbf7d0;
         }
 
-        /* Overbooking önerisi */
         .ob-pill {
             display: inline-flex;
             align-items: center;
@@ -462,7 +734,6 @@
             border: 1px solid #bfdbfe;
         }
 
-        /* Risk durumu mini bar */
         .risk-meter {
             display: flex;
             gap: 3px;
@@ -474,7 +745,6 @@
             width: 22px;
             border-radius: 3px;
             background: #f1f5f9;
-            transition: background .2s;
         }
 
         /* ── Insights ── */
@@ -493,7 +763,7 @@
             gap: 13px;
             align-items: flex-start;
             box-shadow: 0 1px 3px rgba(15,23,42,.04);
-            transition: box-shadow .15s, transform .15s;
+            transition: box-shadow .15s,transform .15s;
         }
 
             .ins-card:hover {
@@ -536,7 +806,6 @@
             font-weight: 600;
         }
 
-        /* ── Section title ── */
         .ns-sec-title {
             font-size: 15px;
             font-weight: 700;
@@ -561,6 +830,21 @@
             .ins-grid {
                 grid-template-columns: repeat(2,1fr);
             }
+
+            .fos-meta-sep {
+                display: none;
+            }
+
+            .fos-meta-item {
+                min-width: 140px;
+                padding: 8px 12px;
+            }
+        }
+
+        @@media (max-width:900px) {
+            .fos-connector {
+                min-width: 100px;
+            }
         }
 
         @@media (max-width:640px) {
@@ -574,6 +858,10 @@
 
             .ns-search input {
                 width: 140px;
+            }
+
+            .fos-iata {
+                font-size: 20px;
             }
         }
     </style>
@@ -608,15 +896,119 @@
                 </div>
             </div>
 
+            @* ── Flight Operation Summary ── *@
+            <div class="fos-card">
+                <div class="fos-top">
+                    <div class="fos-route-wrap">
+                        <div class="fos-airport">
+                            <span class="fos-iata">SAW</span>
+                            <span class="fos-airport-name">İstanbul Sabiha Gökçen</span>
+                            <span class="fos-country">Türkiye</span>
+                        </div>
+                        <div class="fos-connector">
+                            <div class="fos-conn-line">
+                                <span class="fos-conn-dot"></span>
+                                <span class="fos-conn-dashes"></span>
+                                <i class="bi bi-airplane-fill fos-plane-ico"></i>
+                                <span class="fos-conn-dashes"></span>
+                                <span class="fos-conn-dot"></span>
+                            </div>
+                            <div class="fos-conn-meta">
+                                <span><i class="bi bi-clock me-1"></i>~2s 30dk</span>
+                                <span><i class="bi bi-arrows-expand me-1"></i>1.380 km</span>
+                            </div>
+                        </div>
+                        <div class="fos-airport fos-airport-right">
+                            <span class="fos-iata">BGY</span>
+                            <span class="fos-airport-name">Milano Bergamo</span>
+                            <span class="fos-country">İtalya</span>
+                        </div>
+                    </div>
+                    <div class="fos-badges">
+                        <span class="fos-badge fos-badge-blue"><i class="bi bi-calendar3"></i> 2026 Yıllık Analiz</span>
+                        <span class="fos-badge fos-badge-green"><i class="bi bi-check-circle-fill"></i> Aktif Rota</span>
+                        <span class="fos-badge fos-badge-purple"><i class="bi bi-robot"></i> AI Analizi Aktif</span>
+                    </div>
+                </div>
+
+                <div class="fos-divider"></div>
+
+                <div class="fos-meta-grid">
+                    <div class="fos-meta-item">
+                        <div class="fos-meta-ico" style="background:#eff6ff;color:#2563eb;">
+                            <i class="bi bi-calendar-range"></i>
+                        </div>
+                        <div class="fos-meta-body">
+                            <span class="fos-meta-lbl">Analiz Dönemi</span>
+                            <span class="fos-meta-val">01 Oca 2026 — 31 Ara 2026</span>
+                            <span class="fos-meta-sub">365 günlük veri seti</span>
+                        </div>
+                    </div>
+                    <div class="fos-meta-sep"></div>
+                    <div class="fos-meta-item">
+                        <div class="fos-meta-ico" style="background:#f0fdf4;color:#16a34a;">
+                            <i class="bi bi-airplane-engines-fill"></i>
+                        </div>
+                        <div class="fos-meta-body">
+                            <span class="fos-meta-lbl">Günlük Operasyon</span>
+                            <span class="fos-meta-val">4 Uçuş / Gün</span>
+                            <div class="fos-slots">
+                                <span class="fos-slot fos-slot-morning">M1</span>
+                                <span class="fos-slot fos-slot-morning">M2</span>
+                                <span class="fos-slot fos-slot-evening">E1</span>
+                                <span class="fos-slot fos-slot-evening">E2</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fos-meta-sep"></div>
+                    <div class="fos-meta-item">
+                        <div class="fos-meta-ico" style="background:#f5f3ff;color:#7c3aed;">
+                            <i class="bi bi-database-fill"></i>
+                        </div>
+                        <div class="fos-meta-body">
+                            <span class="fos-meta-lbl">Toplam Veri</span>
+                            <span class="fos-meta-val">1.460 Uçuş Kaydı</span>
+                            <span class="fos-meta-sub">365 gün × 4 slot</span>
+                        </div>
+                    </div>
+                    <div class="fos-meta-sep"></div>
+                    <div class="fos-meta-item">
+                        <div class="fos-meta-ico" style="background:#fff7ed;color:#ea580c;">
+                            <i class="bi bi-cpu-fill"></i>
+                        </div>
+                        <div class="fos-meta-body">
+                            <span class="fos-meta-lbl">AI Modülleri</span>
+                            <div class="fos-ai-chips">
+                                <span class="fos-ai-chip">Forecasting</span>
+                                <span class="fos-ai-chip">No-Show</span>
+                                <span class="fos-ai-chip">Overbooking</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fos-meta-sep"></div>
+                    <div class="fos-meta-item fos-meta-item-wide">
+                        <div class="fos-meta-ico" style="background:#fef2f2;color:#dc2626;">
+                            <i class="bi bi-airplane-fill"></i>
+                        </div>
+                        <div class="fos-meta-body">
+                            <span class="fos-meta-lbl">Kullanılan Filo</span>
+                            <div class="fos-fleet">
+                                <span class="fos-fleet-item"><i class="bi bi-dot"></i>Airbus A320</span>
+                                <span class="fos-fleet-item"><i class="bi bi-dot"></i>Airbus A321</span>
+                                <span class="fos-fleet-item"><i class="bi bi-dot"></i>Boeing 737 MAX</span>
+                                <span class="fos-fleet-item"><i class="bi bi-dot"></i>A321neo High Density</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @* ── KPI Cards ── *@
             <div class="kpi-grid">
-
                 <div class="kpi-card kpi-card-blue">
                     <div class="kpi-top">
                         <div class="kpi-lbl">Ortalama No-Show</div>
-                        <div class="kpi-ico" style="background:#eff6ff;color:#2563eb;">
-                            <i class="bi bi-percent"></i>
-                        </div>
+                        <div class="kpi-ico" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-percent"></i></div>
                     </div>
                     <div class="kpi-val">%@avgNoShow.ToString("0.0")</div>
                     <div class="kpi-foot">
@@ -626,13 +1018,10 @@
                         tüm slotlar geneli
                     </div>
                 </div>
-
                 <div class="kpi-card kpi-card-red">
                     <div class="kpi-top">
                         <div class="kpi-lbl">En Riskli Slot</div>
-                        <div class="kpi-ico" style="background:#fef2f2;color:#dc2626;">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                        </div>
+                        <div class="kpi-ico" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i></div>
                     </div>
                     <div class="kpi-val" style="font-size:20px;margin-top:4px;">@riskiest.Key</div>
                     <div class="kpi-foot">
@@ -640,13 +1029,10 @@
                         en yüksek no-show oranı
                     </div>
                 </div>
-
                 <div class="kpi-card kpi-card-green">
                     <div class="kpi-top">
                         <div class="kpi-lbl">En Stabil Slot</div>
-                        <div class="kpi-ico" style="background:#f0fdf4;color:#16a34a;">
-                            <i class="bi bi-shield-check-fill"></i>
-                        </div>
+                        <div class="kpi-ico" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-shield-check-fill"></i></div>
                     </div>
                     <div class="kpi-val" style="font-size:20px;margin-top:4px;">@stablest.Key</div>
                     <div class="kpi-foot">
@@ -654,13 +1040,10 @@
                         en düşük no-show oranı
                     </div>
                 </div>
-
                 <div class="kpi-card kpi-card-orange">
                     <div class="kpi-top">
-                        <div class="kpi-lbl">Ort. Overbooking Riski</div>
-                        <div class="kpi-ico" style="background:#fffbeb;color:#d97706;">
-                            <i class="bi bi-airplane-fill"></i>
-                        </div>
+                        <div class="kpi-lbl">Ort. Overbooking Önerisi</div>
+                        <div class="kpi-ico" style="background:#fffbeb;color:#d97706;"><i class="bi bi-airplane-fill"></i></div>
                     </div>
                     <div class="kpi-val">%@avgOverbooking.ToString("0.0")</div>
                     <div class="kpi-foot">
@@ -668,7 +1051,6 @@
                         önerilen overbooking oranı
                     </div>
                 </div>
-
             </div>
 
             @* ── Filtre Barı ── *@
@@ -715,29 +1097,18 @@
                         </thead>
                         <tbody>
 
-                            @* ── foreach aynen korundu ── *@
                             @foreach (var item in Model)
                             {
-                                @* Risk hesabı *@
                                 string riskLvl = item.Value >= 7 ? "high" : item.Value >= 5 ? "medium" : "low";
                                 string riskLabel = item.Value >= 7 ? "Yüksek" : item.Value >= 5 ? "Orta" : "Düşük";
                                 string riskClass = item.Value >= 7 ? "risk-high" : item.Value >= 5 ? "risk-medium" : "risk-low";
                                 string riskIcon = item.Value >= 7 ? "bi-fire" : item.Value >= 5 ? "bi-dash-circle" : "bi-check-circle";
                                 string barColor = item.Value >= 7 ? "#dc2626" : item.Value >= 5 ? "#d97706" : "#16a34a";
-                                string dotColor = item.Value >= 7 ? "#dc2626" : item.Value >= 5 ? "#d97706" : "#16a34a";
-
-                                @* Overbooking önerisi: no-show * 0.6 *@
                                 double obSuggestion = Math.Round(item.Value * 0.6, 1);
-
-                                @* Progress bar genişliği: max %15 üzerinden oranla *@
                                 double barWidth = Math.Min(item.Value / 15.0 * 100, 100);
-
-                                @* Risk meter: 3 segment *@
                                 string seg1 = item.Value >= 1 ? barColor : "#f1f5f9";
                                 string seg2 = item.Value >= 5 ? barColor : "#f1f5f9";
                                 string seg3 = item.Value >= 7 ? barColor : "#f1f5f9";
-
-                                @* Operasyon notu *@
                                 string opNote = item.Value >= 7
                                 ? "Agresif overbooking + ekstra standby önerilir."
                                 : item.Value >= 5
@@ -747,7 +1118,7 @@
                                 <tr class="ns-row" data-risk="@riskLvl" data-slot="@item.Key.ToLower()">
                                     <td>
                                         <div class="slot-cell">
-                                            <div class="slot-dot" style="background:@dotColor;box-shadow:0 0 0 3px @dotColor\22;"></div>
+                                            <div class="slot-dot" style="background:@barColor;"></div>
                                             <span class="slot-name">@item.Key</span>
                                         </div>
                                     </td>
@@ -758,9 +1129,7 @@
                                                      style="width:@barWidth.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%;background:@barColor;">
                                                 </div>
                                             </div>
-                                            <span class="ns-pct-lbl" style="color:@barColor;">
-                                                %@item.Value.ToString("0.0")
-                                            </span>
+                                            <span class="ns-pct-lbl" style="color:@barColor;">%@item.Value.ToString("0.0")</span>
                                         </div>
                                     </td>
                                     <td>
@@ -822,7 +1191,7 @@
                         </div>
                         <div>
                             <div class="ins-title">Morning-1 Kontrollü Overbooking</div>
-                            <div class="ins-desc">Morning-1 slotunda geçmiş veri tutarlılığı yüksek. %@(Math.Round(avgNoShow * 0.6, 1)) oranında kontrollü overbooking güvenli şekilde uygulanabilir.</div>
+                            <div class="ins-desc">Morning-1 slotunda geçmiş veri tutarlılığı yüksek. %@avgOverbooking oranında kontrollü overbooking güvenli şekilde uygulanabilir.</div>
                             <span class="ins-tag" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-check-circle"></i> Öneri</span>
                         </div>
                     </div>
@@ -843,8 +1212,8 @@
                             <i class="bi bi-shield-check-fill"></i>
                         </div>
                         <div>
-                            <div class="ins-title">Stabil Slot Performansı</div>
-                            <div class="ins-desc">@stablest.Key slotu en düşük no-show oranı ile (%@stablest.Value.ToString("0.0")) istikrarlı seyrediyor. Mevcut operasyon yeterli.</div>
+                            <div class="ins-title">Stabil Slot: @stablest.Key</div>
+                            <div class="ins-desc">@stablest.Key slotu %@stablest.Value.ToString("0.0") no-show oranıyla SAW→BGY rotasının en istikrarlı slotu. Mevcut operasyon stratejisi yeterli.</div>
                             <span class="ins-tag" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-stars"></i> İyi Performans</span>
                         </div>
                     </div>
@@ -855,7 +1224,7 @@
                         </div>
                         <div>
                             <div class="ins-title">Genel No-Show Ortalaması</div>
-                            <div class="ins-desc">Tüm slotlar genelinde ortalama no-show %@avgNoShow.ToString("0.0") seviyesinde. Sektör ortalamasıyla karşılaştırmalı analiz yapılmalı.</div>
+                            <div class="ins-desc">SAW→BGY rotasında ortalama no-show %@avgNoShow.ToString("0.0") seviyesinde. Sektör ortalamasıyla karşılaştırmalı analiz yapılmalı.</div>
                             <span class="ins-tag" style="background:#f5f3ff;color:#7c3aed;"><i class="bi bi-bar-chart-fill"></i> Analiz</span>
                         </div>
                     </div>
@@ -866,7 +1235,7 @@
                         </div>
                         <div>
                             <div class="ins-title">Gelir Optimizasyonu</div>
-                            <div class="ins-desc">Ortalama %@avgOverbooking.ToString("0.0") overbooking oranı uygulanırsa boş koltuk kaybı minimize edilebilir. Gelir artışı beklentisi yüksek.</div>
+                            <div class="ins-desc">Ortalama %@avgOverbooking overbooking uygulanırsa boş koltuk kaybı minimize edilebilir. SAW→BGY rotasında gelir artışı beklentisi yüksek.</div>
                             <span class="ins-tag" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-arrow-up-right"></i> Fırsat</span>
                         </div>
                     </div>
@@ -880,11 +1249,10 @@
 
 @section Scripts {
     <script>
-        /* ── Filtre ── */
         function filterRows(type, btn) {
             document.querySelectorAll('.ns-chip').forEach(function(c){ c.classList.remove('active'); });
             btn.classList.add('active');
-            var rows    = document.querySelectorAll('#nsTable tbody .ns-row');
+            var rows = document.querySelectorAll('#nsTable tbody .ns-row');
             var visible = 0;
             rows.forEach(function(row) {
                 var show = type === 'all' || row.dataset.risk === type;
@@ -894,9 +1262,8 @@
             document.getElementById('recCount').textContent = visible + ' kayıt';
         }
 
-        /* ── Arama ── */
         function searchRows(val) {
-            var rows    = document.querySelectorAll('#nsTable tbody .ns-row');
+            var rows = document.querySelectorAll('#nsTable tbody .ns-row');
             var visible = 0;
             val = val.toLowerCase();
             rows.forEach(function(row) {
@@ -907,7 +1274,6 @@
             document.getElementById('recCount').textContent = visible + ' kayıt';
         }
 
-        /* ── Export CSV ── */
         function exportCSV() {
             var rows  = document.querySelectorAll('#nsTable tbody .ns-row');
             var lines = ['Flight Slot,No-Show %,Risk Seviyesi,Önerilen Overbooking'];
@@ -923,7 +1289,7 @@
             var blob = new Blob([lines.join('\n')], { type:'text/csv;charset=utf-8;' });
             var url  = URL.createObjectURL(blob);
             var a    = document.createElement('a');
-            a.href   = url; a.download = 'noshow-analiz.csv'; a.click();
+            a.href = url; a.download = 'noshow-analiz.csv'; a.click();
             URL.revokeObjectURL(url);
         }
     </script>
